@@ -45,15 +45,18 @@ public class SaludDelJugador : MonoBehaviour
         if (healthBar != null)
             healthBar.value = currentHealth;
 
-        Debug.Log("Jugador recibe daño. Vida actual: " + currentHealth);
+        Debug.Log($"[SaludDelJugador] Jugador recibe {damage} de daño. Vida actual: {currentHealth}/{maxHealth}");
 
         if (currentHealth <= 0)
+        {
+            Debug.Log("[SaludDelJugador] Vida <= 0, llamando a Die()");
             Die();
+        }
     }
 
     void Die()
     {
-        Debug.Log("El jugador ha muerto");
+        Debug.Log($"El jugador ha muerto en escena: {SceneManager.GetActiveScene().name}");
 
         // Mostrar GAME OVER panel
         if (gameOverPanel != null)
@@ -62,12 +65,48 @@ public class SaludDelJugador : MonoBehaviour
         // Bloquear controles del jugador aquí si tienes script de movimiento
         // GetComponent<PlayerMovement>().enabled = false;
 
-        // Reiniciar la escena después de 3 segundos
-        Invoke("RestartScene", 3f);
+        // Pausar el juego
+        Time.timeScale = 0f;
+
+        // Volver al primer nivel después de 3 segundos (usando tiempo real)
+        StartCoroutine(ReturnToFirstLevelCoroutine(3f));
     }
 
-    void RestartScene()
+    /// <summary>
+    /// Coroutine que espera X segundos y luego vuelve SIEMPRE al primer nivel (escena 0 - primerMundo).
+    /// Usa tiempo real porque el juego está pausado.
+    /// </summary>
+    System.Collections.IEnumerator ReturnToFirstLevelCoroutine(float seconds)
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Debug.Log($"[SaludDelJugador] Esperando {seconds} segundos antes de volver al primer nivel...");
+        
+        float t = seconds;
+        while (t > 0f)
+        {
+            Debug.Log($"[SaludDelJugador] Reiniciando en {Mathf.CeilToInt(t)} segundos...");
+            // Usar WaitForSecondsRealtime porque el juego está pausado (Time.timeScale = 0)
+            yield return new WaitForSecondsRealtime(1f);
+            t -= 1f;
+        }
+
+        // Resetear GameManager si existe
+        if (GameManager.Instance != null)
+        {
+            Debug.Log("[SaludDelJugador] Reseteando scores del GameManager");
+            GameManager.Instance.ResetScores();
+        }
+        else
+        {
+            Debug.LogWarning("[SaludDelJugador] GameManager.Instance no encontrado");
+        }
+
+        // Reanudar el tiempo antes de cambiar de escena
+        Time.timeScale = 1f;
+        Debug.Log("[SaludDelJugador] Time.timeScale = 1 (juego reanudado)");
+
+        Debug.Log($"[SaludDelJugador] >>> CARGANDO ESCENA 0 (primerMundo) desde {SceneManager.GetActiveScene().name} <<<");
+        
+        // SIEMPRE volver al primer nivel (escena 0 - primerMundo)
+        SceneManager.LoadScene(0);
     }
 }

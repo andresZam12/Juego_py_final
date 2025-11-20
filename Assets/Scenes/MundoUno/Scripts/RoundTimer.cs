@@ -151,9 +151,13 @@ public class RoundTimer : MonoBehaviour
         return score;
     }
 
+    /// <summary>
+    /// Coroutine de Game Over del RoundTimer.
+    /// SIEMPRE devuelve al jugador al primer nivel (escena 0 - primerMundo).
+    /// </summary>
     private System.Collections.IEnumerator GameOverAndRestartCoroutine(float seconds)
     {
-        Debug.Log("RoundTimer: GameOver coroutine started");
+        Debug.Log($"RoundTimer: GameOver coroutine started en escena: {SceneManager.GetActiveScene().name}");
         float t = seconds;
         while (t > 0f)
         {
@@ -163,8 +167,17 @@ public class RoundTimer : MonoBehaviour
             t -= 1f;
         }
 
-        Debug.Log("RoundTimer: GameOver coroutine finished - reloading scene");
+        // Resetear GameManager
+        if (GameManager.Instance != null)
+        {
+            Debug.Log("RoundTimer: Reseteando GameManager.ResetScores()");
+            GameManager.Instance.ResetScores();
+        }
+
+        Debug.Log($"RoundTimer: >>> CARGANDO ESCENA 0 (primerMundo) desde: {SceneManager.GetActiveScene().name} <<<");
         Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        
+        // SIEMPRE volver al primer nivel (escena 0 - primerMundo)
+        SceneManager.LoadScene(0);
     }
 }

@@ -92,6 +92,7 @@ public class LevelManager : MonoBehaviour
         {
             // iniciar secuencia de game over por muerte del jugador
             levelEndTriggered = true;
+            Debug.Log($"LevelManager: Detectada muerte del jugador en escena {SceneManager.GetActiveScene().name} - Iniciando retorno al primer nivel");
             StartCoroutine(PlayerDeathReturnToFirstWorldCoroutine(10f));
         }
     }
@@ -176,7 +177,7 @@ public class LevelManager : MonoBehaviour
             else if (!levelEndTriggered)
             {
                 levelEndTriggered = true;
-                ShowMessage("Game Over - Tiempo agotado");
+                Debug.Log("Nivel 1: Tiempo agotado - iniciando GameOverSequence");
                 StartCoroutine(GameOverSequence());
             }
         }
@@ -262,24 +263,34 @@ public class LevelManager : MonoBehaviour
 
     #region Game Over & transitions
 
+    /// <summary>
+    /// Game Over por tiempo agotado en nivel 1.
+    /// SIEMPRE devuelve al jugador al primer nivel para reiniciar el juego completo.
+    /// </summary>
     private IEnumerator GameOverSequence()
     {
-        ShowMessage("Game Over");
+        ShowMessage("Game Over - Tiempo agotado");
 
         Time.timeScale = 0f;
         yield return new WaitForSecondsRealtime(messageDuration);
 
-        string currentScene = SceneManager.GetActiveScene().name;
-
         Time.timeScale = 1f;
-        SceneManager.LoadScene(currentScene);
-
         levelEndTriggered = false;
         levelScore = 0;
         levelTimer = 60f;
 
+        // Resetear scores del GameManager
+        if (GameManager.Instance != null)
+            GameManager.Instance.ResetScores();
+
+        // SIEMPRE volver al primer nivel (escena 0 - primerMundo)
+        Debug.Log("GameOver por timeout: Cargando escena 0 (primerMundo)");
+        SceneManager.LoadScene(0);
+
         yield return new WaitForSeconds(0.1f);
-        ShowMainMenu();
+        
+        if (mainMenuPanel != null)
+            ShowMainMenu();
     }
 
     private IEnumerator ShowLevelCompletedThenMenu()
@@ -322,23 +333,46 @@ public class LevelManager : MonoBehaviour
             messageText.gameObject.SetActive(false);
     }
 
+    /// <summary>
+    /// Inicia la secuencia de Game Over cuando el jugador muere.
+    /// SIEMPRE devuelve al jugador al primer nivel (escena 0 - primerMundo) después del countdown.
+    /// Funciona en CUALQUIER nivel donde muera el jugador.
+    /// </summary>
+    /// <param name="countdownSeconds">Tiempo en segundos antes de reiniciar (default: 10)</param>
     public void TriggerPlayerDeathReturnToFirstWorld(float countdownSeconds = 10f)
     {
+        Debug.Log($"TriggerPlayerDeathReturnToFirstWorld llamado en escena: {SceneManager.GetActiveScene().name}");
         if (!levelEndTriggered)
         {
             levelEndTriggered = true;
+            Debug.Log("Iniciando PlayerDeathReturnToFirstWorldCoroutine");
             StartCoroutine(PlayerDeathReturnToFirstWorldCoroutine(countdownSeconds));
+        }
+        else
+        {
+            Debug.LogWarning("TriggerPlayerDeathReturnToFirstWorld: levelEndTriggered ya estaba en true, ignorando");
         }
     }
 
+    /// <summary>
+    /// Coroutine que maneja el countdown de Game Over y retorna al primer nivel.
+    /// - Muestra mensaje "Game Over" con countdown
+    /// - Pausa el juego (Time.timeScale = 0)
+    /// - Resetea todos los scores
+    /// - Carga la escena 0 (primerMundo)
+    /// </summary>
     private IEnumerator PlayerDeathReturnToFirstWorldCoroutine(float seconds)
     {
+        Debug.Log($"PlayerDeathReturnToFirstWorldCoroutine iniciada - Escena actual: {SceneManager.GetActiveScene().name}");
+        
         if (messageText == null)
             messageText = FindMessageTextInScene();
 
         if (messageText != null) messageText.gameObject.SetActive(true);
 
         Time.timeScale = 0f;
+        Debug.Log("Time.timeScale = 0 (juego pausado)");
+        
         float t = seconds;
         while (t > 0f)
         {
@@ -349,14 +383,20 @@ public class LevelManager : MonoBehaviour
         }
 
         Time.timeScale = 1f;
+        Debug.Log("Time.timeScale = 1 (juego reanudado)");
+        
         levelEndTriggered = false;
         levelScore = 0;
         levelTimer = 60f;
         hasSessionStarted = false;
 
         if (GameManager.Instance != null)
+        {
+            Debug.Log("Reseteando scores del GameManager");
             GameManager.Instance.ResetScores();
+        }
 
+        Debug.Log($">>> CARGANDO ESCENA 0 (primerMundo) desde escena actual: {SceneManager.GetActiveScene().name} <<<");
         SceneManager.LoadScene(0);
         yield return null;
 

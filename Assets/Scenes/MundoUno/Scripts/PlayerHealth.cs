@@ -62,7 +62,7 @@ public class PlayerHealth : MonoBehaviour
         if (isDead) return;
         isDead = true;
 
-        Debug.Log("PLAYER DEAD");
+        Debug.Log($"PLAYER DEAD en escena: {SceneManager.GetActiveScene().name}");
 
         // Intentar desactivar scripts de control de forma segura (por nombre o por tipo)
         DisableScriptIfExists("FPSPlayerController");
@@ -128,15 +128,55 @@ public class PlayerHealth : MonoBehaviour
 
     void TriggerReturnSequence()
     {
+        Debug.Log($"PlayerHealth.TriggerReturnSequence() llamado en escena: {SceneManager.GetActiveScene().name}");
+        
         if (LevelManager.instance != null)
         {
+            Debug.Log("LevelManager.instance encontrado - usando TriggerPlayerDeathReturnToFirstWorld");
+            // Usar LevelManager para manejar la secuencia completa (con countdown y reset)
             LevelManager.instance.TriggerPlayerDeathReturnToFirstWorld(10f);
         }
         else
         {
-            Debug.LogWarning("PlayerHealth: LevelManager.instance no encontrada, cargando escena 0 directamente.");
-            SceneManager.LoadScene(0);
+            // Fallback: Si no hay LevelManager, iniciar coroutine local
+            Debug.LogWarning("PlayerHealth: LevelManager.instance NO encontrada, usando fallback para volver al nivel 1.");
+            StartCoroutine(FallbackReturnToFirstWorldCoroutine(10f));
         }
+    }
+
+    /// <summary>
+    /// Coroutine de respaldo que siempre devuelve al nivel 1 (primerMundo) cuando el jugador muere.
+    /// Se usa solo si no hay LevelManager disponible.
+    /// </summary>
+    private System.Collections.IEnumerator FallbackReturnToFirstWorldCoroutine(float seconds)
+    {
+        Debug.Log($"[FALLBACK] Iniciando FallbackReturnToFirstWorldCoroutine desde escena: {SceneManager.GetActiveScene().name}");
+        
+        Time.timeScale = 0f;
+        Debug.Log("[FALLBACK] Time.timeScale = 0 (juego pausado)");
+        
+        float t = seconds;
+        
+        while (t > 0f)
+        {
+            Debug.Log($"[FALLBACK] Game Over - Reiniciando en {Mathf.CeilToInt(t)} segundos...");
+            yield return new WaitForSecondsRealtime(1f);
+            t -= 1f;
+        }
+
+        // Reset del GameManager
+        if (GameManager.Instance != null)
+        {
+            Debug.Log("[FALLBACK] Reseteando GameManager.ResetScores()");
+            GameManager.Instance.ResetScores();
+        }
+
+        Time.timeScale = 1f;
+        Debug.Log("[FALLBACK] Time.timeScale = 1 (juego reanudado)");
+        
+        // SIEMPRE volver a la escena 0 (primerMundo)
+        Debug.Log($"[FALLBACK] >>> CARGANDO ESCENA 0 (primerMundo) desde: {SceneManager.GetActiveScene().name} <<<");
+        SceneManager.LoadScene(0);
     }
 
     // Métodos públicos para que otros scripts lean estado sin acceder a fields directamente
