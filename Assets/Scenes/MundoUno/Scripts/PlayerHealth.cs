@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Collider))]
-public class PlayerHealth : MonoBehaviour
+public class PlayerHealthMain : MonoBehaviour
 {
     [Header("Health")]
     public float maxHealth = 100f;

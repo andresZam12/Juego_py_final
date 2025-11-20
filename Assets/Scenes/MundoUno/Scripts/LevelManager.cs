@@ -29,7 +29,7 @@ public class LevelManager : MonoBehaviour
 
     private static bool hasSessionStarted = false;
     private bool levelEndTriggered = false;
-    private PlayerHealth playerHealth;
+    private PlayerHealthMain playerHealth;
 
     void Awake()
     {
@@ -49,7 +49,7 @@ public class LevelManager : MonoBehaviour
     void Start()
     {
         levelScore = 0;
-        playerHealth = FindObjectOfType<PlayerHealth>();
+        playerHealth = FindObjectOfType<PlayerHealthMain>();
 
         if (messageText != null)
         {
@@ -157,7 +157,7 @@ public class LevelManager : MonoBehaviour
         Cursor.visible = false;
 
         if (playerHealth == null)
-            playerHealth = FindObjectOfType<PlayerHealth>();
+            playerHealth = FindObjectOfType<PlayerHealthMain>();
 
         Debug.Log("StartGameSession: game started, timescale=" + Time.timeScale);
     }
@@ -466,7 +466,7 @@ public class LevelManager : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        playerHealth = FindObjectOfType<PlayerHealth>();
+        playerHealth = FindObjectOfType<PlayerHealthMain>();
         levelEndTriggered = false;
 
         if (messageText == null)
