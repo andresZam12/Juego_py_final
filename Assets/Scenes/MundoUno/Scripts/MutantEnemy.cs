@@ -284,7 +284,7 @@ public class MutantEnemy : MonoBehaviour
         
         if (ObjetivoEnRango(rangoAtaque) && objetivo != null)
         {
-            PlayerHealth playerHealth = objetivo.GetComponent<PlayerHealth>();
+            PlayerHealthMundoUno playerHealth = objetivo.GetComponent<PlayerHealthMundoUno>();
             if (playerHealth != null)
             {
                 playerHealth.TakeDamage(dañoAtaque);
