@@ -2,57 +2,53 @@ using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour
 {
-    [Tooltip("Si >0, el enemigo morirá después de este número de impactos (independiente del 'damage')")]
-    public int hitsToDie = 5;             // <- valor por defecto ahora es 5
-
+    [Header("Sistema de Salud")]
+    [Tooltip("Salud máxima del enemigo")]
     public int maxHealth = 100;
+    
+    [Header("Recompensa")]
     public int scoreOnDeath = 50;
-    public float destroyDelay = 0.1f;     // desaparecer casi instantáneamente
+    
+    [Header("Configuración de Muerte")]
+    public float destroyDelay = 2f;
     public string deathTrigger = "Die";
 
-    int current;
-    int hitsTaken = 0;
-    bool dead = false;
+    private int currentHealth;
+    private bool isDead = false;
 
     void Awake()
     {
-        current = maxHealth;
+        currentHealth = maxHealth;
     }
 
-    // Cuenta impactos (usar TakeHit() por cada bala que impacte)
-    public void TakeHit()
-    {
-        if (dead) return;
-        hitsTaken++;
-        Debug.Log($"{name} TakeHit: {hitsTaken}/{hitsToDie}");
-
-        if (hitsToDie > 0 && hitsTaken >= hitsToDie)
-            Die();
-    }
-
-    // Mantengo TakeDamage por compatibilidad; si hitsToDie>0 cuenta como 1 impacto
+    /// <summary>
+    /// Sistema unificado de daño - usar este método para aplicar daño
+    /// </summary>
     public void TakeDamage(int amount)
     {
-        if (dead) return;
-        current -= amount;
-        Debug.Log($"{name} TakeDamage: {amount} -> {current}");
+        if (isDead) return;
+        
+        currentHealth -= amount;
+        currentHealth = Mathf.Max(0, currentHealth);
 
-        if (hitsToDie > 0)
-        {
-            // contar como 1 impacto y salir
-            TakeHit();
-            return;
-        }
-
-        if (current <= 0) Die();
+        if (currentHealth <= 0)
+            Die();
     }
+    
+    /// <summary>
+    /// Obtener salud actual (útil para barras de vida)
+    /// </summary>
+    public int GetCurrentHealth() => currentHealth;
+    
+    /// <summary>
+    /// Verificar si el enemigo está muerto
+    /// </summary>
+    public bool IsDead() => isDead;
 
     void Die()
     {
-        if (dead) return;
-        dead = true;
-
-        Debug.Log($"{name} DIED");
+        if (isDead) return;
+        isDead = true;
 
         // sumar puntos (si existe GameManager)
         if (GameManager.Instance != null)

@@ -50,6 +50,10 @@ public class WarrokEnemy : MonoBehaviour
     public string paramIsDead = "IsDead";
     public string triggerAttack = "Attack";
     public string triggerDie = "Die";
+    
+    // Cache de parámetros del animator para evitar búsquedas repetidas
+    private bool hasIdleParam, hasRunningParam, hasAttackingParam, hasDeadParam, hasAttackTrigger, hasDieTrigger;
+    private bool animatorParamsCached = false;
 
     private enum EnemyState { Idle, Run, Attack, Death, Exit }
     private EnemyState currentState = EnemyState.Idle;
@@ -93,6 +97,9 @@ public class WarrokEnemy : MonoBehaviour
             navMeshAgent.stoppingDistance = Mathf.Max(0.1f, attackRange - 0.5f);
             navMeshAgent.updateRotation = false; // manejamos rotación manual para suavizado
         }
+        
+        // Cachear parámetros del animator una sola vez
+        CacheAnimatorParams();
     }
 
     void SetupAudioSources()
@@ -221,19 +228,23 @@ public class WarrokEnemy : MonoBehaviour
     }
 
     // ----------------------
-    // Animator helpers (seguros)
+    // Animator helpers (optimizados con cache)
     // ----------------------
-    void UpdateAnimator()
+    void CacheAnimatorParams()
     {
-        if (animator == null) return;
-
-        SafeSetBool(paramIsIdle, currentState == EnemyState.Idle);
-        SafeSetBool(paramIsRunning, currentState == EnemyState.Run);
-        SafeSetBool(paramIsAttacking, currentState == EnemyState.Attack);
-        SafeSetBool(paramIsDead, currentState == EnemyState.Death);
+        if (animator == null || animatorParamsCached) return;
+        
+        hasIdleParam = HasParamDirect(paramIsIdle);
+        hasRunningParam = HasParamDirect(paramIsRunning);
+        hasAttackingParam = HasParamDirect(paramIsAttacking);
+        hasDeadParam = HasParamDirect(paramIsDead);
+        hasAttackTrigger = HasParamDirect(triggerAttack);
+        hasDieTrigger = HasParamDirect(triggerDie);
+        
+        animatorParamsCached = true;
     }
-
-    bool HasParam(string name)
+    
+    bool HasParamDirect(string name)
     {
         if (animator == null || string.IsNullOrEmpty(name)) return false;
         var pars = animator.parameters;
@@ -241,20 +252,27 @@ public class WarrokEnemy : MonoBehaviour
             if (pars[i].name == name) return true;
         return false;
     }
-
-    void SafeSetBool(string name, bool value)
+    
+    void UpdateAnimator()
     {
-        if (animator == null || string.IsNullOrEmpty(name)) return;
-        if (HasParam(name))
-        {
-            try { animator.SetBool(name, value); } catch { }
-        }
+        if (animator == null) return;
+
+        if (hasIdleParam) animator.SetBool(paramIsIdle, currentState == EnemyState.Idle);
+        if (hasRunningParam) animator.SetBool(paramIsRunning, currentState == EnemyState.Run);
+        if (hasAttackingParam) animator.SetBool(paramIsAttacking, currentState == EnemyState.Attack);
+        if (hasDeadParam) animator.SetBool(paramIsDead, currentState == EnemyState.Death);
     }
 
     void SafeSetTrigger(string name)
     {
         if (animator == null || string.IsNullOrEmpty(name)) return;
-        if (HasParam(name))
+        
+        // Usar cache para triggers
+        bool canSet = false;
+        if (name == triggerAttack) canSet = hasAttackTrigger;
+        else if (name == triggerDie) canSet = hasDieTrigger;
+        
+        if (canSet)
         {
             try { animator.SetTrigger(name); } catch { }
         }
@@ -265,7 +283,6 @@ public class WarrokEnemy : MonoBehaviour
     // ----------------------
     void PerformAttack()
     {
-        Debug.Log("Warrok ataca al jugador!");
         PlayAttackSound();
         SafeSetTrigger(triggerAttack);
 
@@ -306,7 +323,6 @@ public class WarrokEnemy : MonoBehaviour
 
         health -= damage;
         health = Mathf.Clamp(health, 0, maxHealth);
-        Debug.Log($"Warrok recibe {damage} de daño. Salud restante: {health}");
 
         if (health <= 0)
         {

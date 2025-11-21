@@ -14,7 +14,6 @@ public class FPSPlayerController : MonoBehaviour
     private CharacterController cc;
     private float verticalVel;
     private float pitch = 0f;
-    private Vector3 lastPos;
 
     void Start()
     {
@@ -24,9 +23,6 @@ public class FPSPlayerController : MonoBehaviour
 
         if (cameraHolder == null && transform.childCount > 0)
             cameraHolder = transform.GetChild(0);
-
-        Debug.Log($"PLAYER START - cameraHolder={(cameraHolder!=null ? cameraHolder.name : "null")} cc={(cc!=null)}");
-        lastPos = transform.position;
 
         // lock cursor only when playing in editor/game
         Cursor.lockState = CursorLockMode.Locked;
@@ -38,26 +34,10 @@ public class FPSPlayerController : MonoBehaviour
         // quick guard
         if (cc == null) return;
 
-        // If game window is not focused, log it once (helps debugging)
-        if (!Application.isFocused)
-        {
-            // do not spam, but log once per frame if not focused
-            Debug.Log("NOTE: Application not focused. Click Game view to ensure input is captured.");
-        }
-
-        // --- debug inputs (temporary)
-        float dbg_h = Input.GetAxis("Horizontal");
-        float dbg_v = Input.GetAxis("Vertical");
-        float dbg_mx = Input.GetAxis("Mouse X");
-        if (Mathf.Abs(dbg_h) > 0.01f || Mathf.Abs(dbg_v) > 0.01f || Mathf.Abs(dbg_mx) > 0.01f)
-        {
-            Debug.Log($"INPUTS -> H:{dbg_h:F2} V:{dbg_v:F2} MX:{dbg_mx:F2}");
-        }
-
         // Movement (read inputs)
         float speed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : walkSpeed;
-        float h = dbg_h;
-        float v = dbg_v;
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
         Vector3 moveDir = transform.right * h + transform.forward * v;
 
         // Jump / Gravity
@@ -89,12 +69,5 @@ public class FPSPlayerController : MonoBehaviour
         pitch = Mathf.Clamp(pitch, -maxLookAngle, maxLookAngle);
         if (cameraHolder != null)
             cameraHolder.localEulerAngles = new Vector3(pitch, 0f, 0f);
-
-        // Quick sanity: if position didn't change and there were inputs, log that
-        if ((Mathf.Abs(h) > 0.01f || Mathf.Abs(v) > 0.01f) && (Vector3.Distance(transform.position, lastPos) < 0.0001f))
-        {
-            Debug.LogWarning("Inputs detected but Player position did not change. Check CharacterController or collisions.");
-        }
-        lastPos = transform.position;
     }
 }

@@ -42,8 +42,6 @@ public class PlayerShooting : MonoBehaviour
 
     void Shoot()
     {
-        Debug.Log("🔫 DISPARO");
-
         // Sonido de disparo
         if (shootSound != null && audioSource != null)
         {
@@ -82,8 +80,6 @@ public class PlayerShooting : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(playerCamera.transform.position, shootDirection, out hit, 100f, enemyLayerMask))
         {
-            Debug.Log("Impacto en: " + hit.collider.name + " en posición: " + hit.point);
-            
             // Verificar si el objeto impactado es un enemigo (MutantEnemy o WarrokEnemy)
             CheckEnemyHit(hit.collider.gameObject);
             
@@ -95,83 +91,51 @@ public class PlayerShooting : MonoBehaviour
                 Instantiate(impactEffect, hit.point, Quaternion.LookRotation(hit.normal));
             }
         }
-        else
-        {
-            // Dibujar línea de debug para ver la dirección del disparo (solo en el editor)
-            Debug.DrawRay(playerCamera.transform.position, shootDirection * 100f, Color.red, 1f);
-        }
     }
 
     void CheckEnemyHit(GameObject hitObject)
     {
-        // PRIMERO: Buscar WarrokEnemy
+        // Cache de componentes para evitar GetComponent duplicados
         WarrokEnemy warrokEnemy = hitObject.GetComponent<WarrokEnemy>();
         if (warrokEnemy == null)
-        {
             warrokEnemy = hitObject.GetComponentInParent<WarrokEnemy>();
-        }
 
         if (warrokEnemy != null && !warrokEnemy.IsDead())
         {
-            Debug.Log("🎯 WARROK ENEMY IMPACTADO - Aplicando " + damagePerShot + " de daño");
-            
-            // Aplicar daño al WarrokEnemy
             warrokEnemy.TakeDamage(damagePerShot);
             
-            // Efecto visual específico para impacto en enemigo
             if (impactEffect != null)
-            {
                 Instantiate(impactEffect, hitObject.transform.position + Vector3.up, Quaternion.identity);
-            }
-            return; // Salir si ya se encontró y dañó un WarrokEnemy
+            
+            return;
         }
 
-        // SEGUNDO: Buscar MutantEnemy (para compatibilidad con enemigos existentes)
+        // Buscar MutantEnemy
         MutantEnemy mutantEnemy = hitObject.GetComponent<MutantEnemy>();
         if (mutantEnemy == null)
-        {
             mutantEnemy = hitObject.GetComponentInParent<MutantEnemy>();
-        }
 
-        if (mutantEnemy != null)
+        if (mutantEnemy != null && !mutantEnemy.EstaMuerto())
         {
-            Debug.Log("🎯 MUTANT ENEMY IMPACTADO - Aplicando " + damagePerShot + " de daño");
-            
-            // Aplicar daño al MutantEnemy
             mutantEnemy.RecibirDano(damagePerShot);
             
-            // Efecto visual específico para impacto en enemigo
             if (impactEffect != null)
-            {
                 Instantiate(impactEffect, hitObject.transform.position + Vector3.up, Quaternion.identity);
-            }
         }
     }
 
-    // MÉTODO PARA BARRILES EXPLOSIVOS
     void CheckBarrelHit(GameObject hitObject)
     {
-        // Buscar el componente ExplosiveBarrel en el objeto impactado o en sus padres
         ExplosiveBarrel barrel = hitObject.GetComponent<ExplosiveBarrel>();
-        
         if (barrel == null)
-        {
-            // Si no se encuentra en el objeto directo, buscar en los padres
             barrel = hitObject.GetComponentInParent<ExplosiveBarrel>();
-        }
 
         if (barrel != null)
         {
-            Debug.Log("🎯 BARRIL IMPACTADO - Aplicando " + damagePerShot + " de daño");
-            
-            // Aplicar daño al barril
             barrel.TakeDamage(damagePerShot);
             
-            // Efecto visual específico para impacto en barril
             if (impactEffect != null)
-            {
                 Instantiate(impactEffect, hitObject.transform.position, Quaternion.identity);
-            }
         }
     }
 

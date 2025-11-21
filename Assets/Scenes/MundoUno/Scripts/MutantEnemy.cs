@@ -108,9 +108,6 @@ public class MutantEnemy : MonoBehaviour
         MaquinaDeEstados();
         ActualizarRotacion();
         ActualizarAnimaciones();
-        
-        // DEBUG: Mostrar estado actual en consola
-        Debug.Log($"Estado: {estadoActual}, Atacando: {estaAtacando}, Cooldown: {Time.time - tiempoUltimoAtaque}");
     }
 
     void VerificarEstadoSalud()
@@ -195,8 +192,6 @@ public class MutantEnemy : MonoBehaviour
         bool puedeAtacar = Time.time - tiempoUltimoAtaque >= cooldownAtaque;
         bool enRango = ObjetivoEnRango(rangoAtaque);
         
-        Debug.Log($"Puede atacar: {puedeAtacar}, En rango: {enRango}, Esta atacando: {estaAtacando}");
-        
         if (puedeAtacar && enRango && !estaAtacando)
         {
             IniciarAtaque();
@@ -260,8 +255,6 @@ public class MutantEnemy : MonoBehaviour
 
     void IniciarAtaque()
     {
-        Debug.Log("INICIANDO ATAQUE!");
-        
         estaAtacando = true;
         tiempoUltimoAtaque = Time.time;
         
@@ -291,40 +284,16 @@ public class MutantEnemy : MonoBehaviour
         
         if (ObjetivoEnRango(rangoAtaque) && objetivo != null)
         {
-            Debug.Log("Aplicando daño al jugador: " + dañoAtaque);
-            
-            // INTENTAR DIFERENTES MÉTODOS PARA APLICAR DAÑO
             PlayerHealth playerHealth = objetivo.GetComponent<PlayerHealth>();
             if (playerHealth != null)
             {
                 playerHealth.TakeDamage(dañoAtaque);
             }
-            else
-            {
-                // ALTERNATIVA: Buscar cualquier componente que tenga TakeDamage
-                MonoBehaviour[] componentes = objetivo.GetComponents<MonoBehaviour>();
-                foreach (MonoBehaviour componente in componentes)
-                {
-                    var tipo = componente.GetType();
-                    var metodo = tipo.GetMethod("TakeDamage");
-                    if (metodo != null)
-                    {
-                        metodo.Invoke(componente, new object[] { dañoAtaque });
-                        Debug.Log("Daño aplicado usando reflexión");
-                        break;
-                    }
-                }
-            }
-        }
-        else
-        {
-            Debug.Log("Objetivo fuera de rango para aplicar daño");
         }
     }
 
     void TerminarAtaque()
     {
-        Debug.Log("Terminando ataque");
         estaAtacando = false;
         
         if (animator != null)
@@ -373,7 +342,6 @@ public class MutantEnemy : MonoBehaviour
         
         saludActual -= dano;
         saludActual = Mathf.Clamp(saludActual, 0, saludMaxima);
-        Debug.Log($"Enemigo recibió {dano} de daño. Salud actual: {saludActual}");
     }
 
     public bool EstaMuerto()
@@ -392,8 +360,6 @@ public class MutantEnemy : MonoBehaviour
     void CambiarEstado(EstadoEnemigo nuevoEstado)
     {
         if (estadoActual == nuevoEstado) return;
-        
-        Debug.Log($"Cambiando estado de {estadoActual} a {nuevoEstado}");
         
         estadoActual = nuevoEstado;
         

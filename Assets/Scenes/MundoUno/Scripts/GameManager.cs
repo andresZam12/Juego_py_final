@@ -7,6 +7,9 @@ public class GameManager : MonoBehaviour
 
     [Tooltip("Índices: 0 = mundoUno, 1 = mundoDos, 2 = mundoTres")]
     public int[] worldScores = new int[3];
+    
+    // Cache para ScoreUI - evitar FindObjectOfType repetidas
+    private ScoreUI cachedScoreUI;
 
     public int TotalScore
     {
@@ -37,31 +40,33 @@ public class GameManager : MonoBehaviour
         if (i >= 0 && i < worldScores.Length)
         {
             worldScores[i] += amount;
-            Debug.Log($"GameManager.AddScore: +{amount} on scene {i} => worldScores[{i}] = {worldScores[i]}  total={TotalScore}");
-        }
-        else
-        {
-            Debug.Log($"GameManager.AddScore called on scene index {i} (not a world). Amount: {amount}");
         }
 
-        // Update UI if present
-        var ui = FindObjectOfType<ScoreUI>();
-        if (ui != null) ui.UpdateScoreText();
+        // Update UI using cached reference
+        if (cachedScoreUI == null)
+            cachedScoreUI = FindObjectOfType<ScoreUI>();
+        
+        if (cachedScoreUI != null) 
+            cachedScoreUI.UpdateScoreText();
     }
 
     public void ResetScores()
     {
         for (int j = 0; j < worldScores.Length; j++) worldScores[j] = 0;
-        Debug.Log("GameManager.ResetScores()");
-        var ui = FindObjectOfType<ScoreUI>();
-        if (ui != null) ui.UpdateScoreText();
+        
+        if (cachedScoreUI == null)
+            cachedScoreUI = FindObjectOfType<ScoreUI>();
+        
+        if (cachedScoreUI != null) 
+            cachedScoreUI.UpdateScoreText();
     }
 
     public void GoToNextWorld()
     {
+        cachedScoreUI = null; // Limpiar cache al cambiar escena
+        
         int current = SceneManager.GetActiveScene().buildIndex;
         int next = current + 1;
-        Debug.Log($"GameManager.GoToNextWorld: current={current} next={next}");
 
         if (next < SceneManager.sceneCountInBuildSettings)
         {
@@ -69,20 +74,20 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            // If no more worlds, go to end screen (assume build index 3 or handle as needed)
+            // If no more worlds, go to end screen
             SceneManager.LoadScene(3);
         }
     }
 
     public void GoToFirstWorld()
     {
+        cachedScoreUI = null; // Limpiar cache al cambiar escena
         ResetScores();
         SceneManager.LoadScene(0);
     }
 
     public void QuitGame()
     {
-        Debug.Log("GameManager.QuitGame called");
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #else
