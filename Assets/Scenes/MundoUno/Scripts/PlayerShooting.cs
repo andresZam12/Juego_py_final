@@ -1,27 +1,28 @@
 using UnityEngine;
 
+// Este script permite al jugador disparar con raycast, aplicar daño a enemigos y reproducir efectos/sonidos
 public class PlayerShooting : MonoBehaviour
 {
     [Header("DISPARO")]
-    public float fireRate = 0.2f;
-    public int damagePerShot = 10;
+    public float fireRate = 0.2f; // Tiempo entre disparos
+    public int damagePerShot = 20; // Daño por disparo
 
     [Header("SONIDO")]
-    public AudioClip shootSound;
-    public AudioSource audioSource;
+    public AudioClip shootSound; // Sonido de disparo
+    public AudioSource audioSource; // Fuente de audio para reproducir el sonido
 
     [Header("EFECTOS VISUALES")]
     public ParticleSystem muzzleFlash; // Efecto de fuego en el cañón
-    public GameObject impactEffect; // Opcional: efecto al impactar una bala
+    public GameObject impactEffect; // Efecto al impactar una bala
 
     [Header("PUNTO DE MIRA")]
-    public Transform crosshair; // Referencia al punto rojo (puede ser un UI Image o un objeto en el mundo)
+    public Transform crosshair; // Referencia al punto rojo (opcional)
     public Camera playerCamera; // Cámara desde la que se dispara
 
     [Header("LAYER MASK")]
     public LayerMask enemyLayerMask = 1; // Capa para detectar enemigos
 
-    private float nextFireTime = 0f;
+    private float nextFireTime = 0f; // Controla el tiempo entre disparos
 
     void Start()
     {
@@ -32,30 +33,29 @@ public class PlayerShooting : MonoBehaviour
 
     void Update()
     {
-        // Dispara con clic izquierdo (botón 0)
+        // Detecta en
         if (Input.GetMouseButton(0) && Time.time >= nextFireTime)
         {
-            Debug.Log("🔫 DISPARO DETECTADO!");
-            Shoot();
-            nextFireTime = Time.time + fireRate;
+            Shoot(); // Ejecuta el disparo
+            nextFireTime = Time.time + fireRate; // Actualiza el tiempo para el próximo disparo
         }
     }
 
     void Shoot()
     {
-        // Sonido de disparo
+        // Reproduce el sonido de disparo
         if (shootSound != null && audioSource != null)
         {
             audioSource.PlayOneShot(shootSound);
         }
 
-        // Partículas del cañón
+        // Efecto cañon
         if (muzzleFlash != null)
         {
             muzzleFlash.Play();
         }
 
-        // Disparar hacia el punto rojo
+        // Lanza el raycast hacia el objetivo
         ShootTowardsCrosshair();
     }
 
@@ -64,86 +64,63 @@ public class PlayerShooting : MonoBehaviour
         if (playerCamera == null) return;
 
         Vector3 shootDirection;
-        
+        // Calcula la dirección del disparo según el punto de mira
         if (crosshair != null)
         {
-            // Si el punto rojo es un objeto en el mundo 3D
             shootDirection = (crosshair.position - transform.position).normalized;
         }
         else
         {
-            // Si el punto rojo es UI, usar el centro de la pantalla
+            // Si no hay crosshair, dispara al centro de la pantalla
             Ray ray = playerCamera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2, 0));
             shootDirection = ray.direction;
         }
 
-        // Realizar el raycast
+        // Realiza el raycast para detectar impacto
         RaycastHit hit;
-        Debug.Log($"📍 Disparando desde: {playerCamera.transform.position} en dirección: {shootDirection}");
-        
         if (Physics.Raycast(playerCamera.transform.position, shootDirection, out hit, 100f, enemyLayerMask))
         {
-            Debug.Log($"🎯 IMPACTO en: {hit.collider.gameObject.name} - Layer: {LayerMask.LayerToName(hit.collider.gameObject.layer)}");
-            
-            // Verificar si el objeto impactado es un enemigo (MutantEnemy o WarrokEnemy)
+            // Si impacta algo, verifica si es enemigo o barril
             CheckEnemyHit(hit.collider.gameObject);
-            
-            // Verificar si el objeto impactado es un barril
             CheckBarrelHit(hit.collider.gameObject);
-            
+            // Instancia efecto visual de impacto
             if (impactEffect != null)
             {
                 Instantiate(impactEffect, hit.point, Quaternion.LookRotation(hit.normal));
             }
         }
-        else
-        {
-            Debug.Log("❌ Raycast NO impactó nada");
-        }
     }
 
+    // Verifica si el objeto impactado es un enemigo y aplica daño
     void CheckEnemyHit(GameObject hitObject)
     {
-        Debug.Log($"🔍 CheckEnemyHit en objeto: {hitObject.name}");
-        
-        // Cache de componentes para evitar GetComponent duplicados
+        // Busca WarrokEnemy
         WarrokEnemy warrokEnemy = hitObject.GetComponent<WarrokEnemy>();
         if (warrokEnemy == null)
             warrokEnemy = hitObject.GetComponentInParent<WarrokEnemy>();
 
         if (warrokEnemy != null && !warrokEnemy.IsDead())
         {
-            Debug.Log($"💥 Aplicando {damagePerShot} daño a WarrokEnemy");
             warrokEnemy.TakeDamage(damagePerShot);
-            
             if (impactEffect != null)
                 Instantiate(impactEffect, hitObject.transform.position + Vector3.up, Quaternion.identity);
-            
             return;
         }
 
-        // Buscar MutantEnemy
+        // Busca MutantEnemy
         MutantEnemy mutantEnemy = hitObject.GetComponent<MutantEnemy>();
         if (mutantEnemy == null)
             mutantEnemy = hitObject.GetComponentInParent<MutantEnemy>();
 
-        Debug.Log($"🧟 MutantEnemy encontrado: {mutantEnemy != null}");
-        
         if (mutantEnemy != null && !mutantEnemy.EstaMuerto())
         {
-            Debug.Log($"💥 Aplicando {damagePerShot} daño a MutantEnemy - Salud antes: {mutantEnemy.saludActual}");
             mutantEnemy.RecibirDano(damagePerShot);
-            Debug.Log($"💚 Salud después: {mutantEnemy.saludActual}");
-            
             if (impactEffect != null)
                 Instantiate(impactEffect, hitObject.transform.position + Vector3.up, Quaternion.identity);
         }
-        else
-        {
-            Debug.LogWarning($"⚠️ No se encontró MutantEnemy o WarrokEnemy en {hitObject.name}");
-        }
     }
 
+    // Verifica si el objeto impactado es un barril explosivo y aplica daño
     void CheckBarrelHit(GameObject hitObject)
     {
         ExplosiveBarrel barrel = hitObject.GetComponent<ExplosiveBarrel>();
@@ -153,16 +130,14 @@ public class PlayerShooting : MonoBehaviour
         if (barrel != null)
         {
             barrel.TakeDamage(damagePerShot);
-            
             if (impactEffect != null)
                 Instantiate(impactEffect, hitObject.transform.position, Quaternion.identity);
         }
     }
 
-    // Método para configurar la layer mask desde el inspector fácilmente
+    // Método para facilitar la selección de layer en el inspector
     void OnValidate()
     {
-        // Esto ayuda a seleccionar layers en el inspector
         if (enemyLayerMask == 0)
             enemyLayerMask = 1; // Default layer
     }

@@ -30,13 +30,5 @@ public class ScoreUI : MonoBehaviour
             scoreText.text = "Score: 0";
     }
 
-    // Nota: no necesitamos actualizar cada frame. Si quieres refrescar en tiempo real, 
-    // puedes descomentar Update() y dejarlo. Pero es más eficiente llamar UpdateScoreText()
-    // sólo cuando el score cambia (GameManager.AddScore hace un Find+Update).
-    /*
-    void Update()
-    {
-        UpdateScoreText();
-    }
-    */
+
 }
