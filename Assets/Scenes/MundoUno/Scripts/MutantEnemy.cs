@@ -316,6 +316,14 @@ public class MutantEnemy : MonoBehaviour
         estaVivo = false;
         CambiarEstado(EstadoEnemigo.Death);
         
+        // Sumar score al GameManager
+        if (GameManager.Instance != null)
+        {
+            int scoreAmount = 50; // Puntos por matar este enemigo
+            GameManager.Instance.AddScore(scoreAmount);
+            Debug.Log($"💰 Enemigo muerto! +{scoreAmount} puntos");
+        }
+        
         if (sonidoMuerte != null && audioSourceMuerte != null)
         {
             audioSourceMuerte.clip = sonidoMuerte;
@@ -333,7 +341,7 @@ public class MutantEnemy : MonoBehaviour
         CancelInvoke("AplicarDaño");
         CancelInvoke("TerminarAtaque");
         
-        Destroy(gameObject, 3f);
+        Destroy(gameObject, 0.1f); // Desaparece más rápido
     }
 
     public void RecibirDano(int dano)

@@ -35,6 +35,7 @@ public class PlayerShooting : MonoBehaviour
         // Dispara con clic izquierdo (botón 0)
         if (Input.GetMouseButton(0) && Time.time >= nextFireTime)
         {
+            Debug.Log("🔫 DISPARO DETECTADO!");
             Shoot();
             nextFireTime = Time.time + fireRate;
         }
@@ -78,8 +79,12 @@ public class PlayerShooting : MonoBehaviour
 
         // Realizar el raycast
         RaycastHit hit;
+        Debug.Log($"📍 Disparando desde: {playerCamera.transform.position} en dirección: {shootDirection}");
+        
         if (Physics.Raycast(playerCamera.transform.position, shootDirection, out hit, 100f, enemyLayerMask))
         {
+            Debug.Log($"🎯 IMPACTO en: {hit.collider.gameObject.name} - Layer: {LayerMask.LayerToName(hit.collider.gameObject.layer)}");
+            
             // Verificar si el objeto impactado es un enemigo (MutantEnemy o WarrokEnemy)
             CheckEnemyHit(hit.collider.gameObject);
             
@@ -91,10 +96,16 @@ public class PlayerShooting : MonoBehaviour
                 Instantiate(impactEffect, hit.point, Quaternion.LookRotation(hit.normal));
             }
         }
+        else
+        {
+            Debug.Log("❌ Raycast NO impactó nada");
+        }
     }
 
     void CheckEnemyHit(GameObject hitObject)
     {
+        Debug.Log($"🔍 CheckEnemyHit en objeto: {hitObject.name}");
+        
         // Cache de componentes para evitar GetComponent duplicados
         WarrokEnemy warrokEnemy = hitObject.GetComponent<WarrokEnemy>();
         if (warrokEnemy == null)
@@ -102,6 +113,7 @@ public class PlayerShooting : MonoBehaviour
 
         if (warrokEnemy != null && !warrokEnemy.IsDead())
         {
+            Debug.Log($"💥 Aplicando {damagePerShot} daño a WarrokEnemy");
             warrokEnemy.TakeDamage(damagePerShot);
             
             if (impactEffect != null)
@@ -115,12 +127,20 @@ public class PlayerShooting : MonoBehaviour
         if (mutantEnemy == null)
             mutantEnemy = hitObject.GetComponentInParent<MutantEnemy>();
 
+        Debug.Log($"🧟 MutantEnemy encontrado: {mutantEnemy != null}");
+        
         if (mutantEnemy != null && !mutantEnemy.EstaMuerto())
         {
+            Debug.Log($"💥 Aplicando {damagePerShot} daño a MutantEnemy - Salud antes: {mutantEnemy.saludActual}");
             mutantEnemy.RecibirDano(damagePerShot);
+            Debug.Log($"💚 Salud después: {mutantEnemy.saludActual}");
             
             if (impactEffect != null)
                 Instantiate(impactEffect, hitObject.transform.position + Vector3.up, Quaternion.identity);
+        }
+        else
+        {
+            Debug.LogWarning($"⚠️ No se encontró MutantEnemy o WarrokEnemy en {hitObject.name}");
         }
     }
 
