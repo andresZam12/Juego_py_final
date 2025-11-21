@@ -64,9 +64,8 @@ public class PlayerHealthMain : MonoBehaviour
 
         Debug.Log($"PLAYER DEAD en escena: {SceneManager.GetActiveScene().name}");
 
-        // Intentar desactivar scripts de control de forma segura (por nombre o por tipo)
+        // Desactivar scripts de control
         DisableScriptIfExists("FPSPlayerController");
-        DisableScriptIfExists("PlayerMovement");
         DisableScriptIfExists("PlayerShooting");
 
         // También desactivar cualquier MonoBehaviour que tenga nombres parecidos

@@ -342,12 +342,6 @@ public class WarrokEnemy : MonoBehaviour
         PlayDeathSound();
         StopNavMeshAgent();
 
-        // deshabilitar scripts de comportamiento si existen
-        var ai = GetComponent<EnemyChaseAvoid>();
-        if (ai != null) ai.enabled = false;
-        var attack = GetComponent<EnemyAttackSimple>();
-        if (attack != null) attack.enabled = false;
-
         // desactivar navmesh
         if (navMeshAgent != null) navMeshAgent.enabled = false;
 

@@ -916,7 +916,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b9ec86082d0f4d499fbbffcc708c0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitsToDie: 5
   maxHealth: 100
   scoreOnDeath: 50
   destroyDelay: 0.1
@@ -1913,7 +1912,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b9ec86082d0f4d499fbbffcc708c0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitsToDie: 5
   maxHealth: 100
   scoreOnDeath: 50
   destroyDelay: 0.1
@@ -2402,7 +2400,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b9ec86082d0f4d499fbbffcc708c0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitsToDie: 5
   maxHealth: 100
   scoreOnDeath: 50
   destroyDelay: 0.1
@@ -2988,7 +2985,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b9ec86082d0f4d499fbbffcc708c0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitsToDie: 5
   maxHealth: 100
   scoreOnDeath: 50
   destroyDelay: 0.1
@@ -3555,7 +3551,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b9ec86082d0f4d499fbbffcc708c0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitsToDie: 5
   maxHealth: 100
   scoreOnDeath: 50
   destroyDelay: 0.1
@@ -4042,7 +4037,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b9ec86082d0f4d499fbbffcc708c0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitsToDie: 5
   maxHealth: 100
   scoreOnDeath: 50
   destroyDelay: 0.1
@@ -5080,7 +5074,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1216368519549315066, guid: 2f6b5402acaac7e45a0b798395dd250b, type: 3}
       propertyPath: m_RootOrder
-      value: 14
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 1216368519549315066, guid: 2f6b5402acaac7e45a0b798395dd250b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -5461,7 +5455,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b9ec86082d0f4d499fbbffcc708c0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitsToDie: 5
   maxHealth: 100
   scoreOnDeath: 50
   destroyDelay: 0.1
@@ -5768,7 +5761,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 15
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1867210361
 PrefabInstance:
@@ -5916,7 +5909,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b9ec86082d0f4d499fbbffcc708c0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitsToDie: 20
   maxHealth: 100
   scoreOnDeath: 50
   destroyDelay: 0.1
@@ -6409,7 +6401,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b9ec86082d0f4d499fbbffcc708c0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitsToDie: 5
   maxHealth: 100
   scoreOnDeath: 50
   destroyDelay: 0.1
@@ -7112,7 +7103,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7b9ec86082d0f4d499fbbffcc708c0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hitsToDie: 5
   maxHealth: 100
   scoreOnDeath: 50
   destroyDelay: 0.1
