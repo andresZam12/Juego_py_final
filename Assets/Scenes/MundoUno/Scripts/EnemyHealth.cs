@@ -63,9 +63,6 @@ public class EnemyHealth : MonoBehaviour
         Collider[] cols = GetComponentsInChildren<Collider>();
         foreach (var c in cols) c.enabled = false;
 
-        var chase = GetComponent<EnemyChase>();
-        if (chase != null) chase.NotifyDead();
-
         var agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         if (agent != null) agent.enabled = false;
 
