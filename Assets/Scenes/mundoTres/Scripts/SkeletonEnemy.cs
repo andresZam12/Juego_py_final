@@ -6,13 +6,13 @@ public class SkeletonEnemy : MonoBehaviour
     public float health = 100f;
     
     [Header("Movimiento")]
-    public float moveSpeed = 3.5f;
-    public float detectionRange = 15f;
+    public float moveSpeed = 6f;
+    public float detectionRange = 30f;
     public float attackRange = 2f;
     public float rotationSpeed = 5f;
     
     [Header("Ataque")]
-    public float attackDamage = 10f;
+    public float attackDamage = 40f;
     public float attackCooldown = 1.5f;
     
     private Transform player;
