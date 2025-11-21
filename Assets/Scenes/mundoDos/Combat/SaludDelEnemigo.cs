@@ -78,10 +78,11 @@ public class SaludDelEnemigo : MonoBehaviour
         // Esperar mientras se muestra el panel de victoria
         yield return new WaitForSeconds(delayBeforeNextLevel);
 
-        Debug.Log("[SaludDelEnemigo] Cargando Map_v1 (índice 2)...");
+        Debug.Log("[SaludDelEnemigo] Cargando Map_v1 (índice 3)...");
         
-        // Cargar el tercer nivel (Map_v1 está en el índice 2 del Build Settings)
-        SceneManager.LoadScene(2);
+        // Cargar el tercer nivel (Map_v1 está en el índice 3 del Build Settings)
+        // Índice 0: InicioJuego, 1: primerMundo, 2: Test_Map, 3: Map_v1, 4: ResultadosEscene
+        SceneManager.LoadScene(3);
         
         // Ahora sí, destruir el gameObject después de iniciar la carga
         if (destroyGameObject)

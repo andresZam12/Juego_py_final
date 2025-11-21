@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/InicioJuego.unity
+    guid: ef7ed2d89d6d8b04eb013a35e2c1f0c4
+  - enabled: 1
     path: Assets/Scenes/EcenesEJEC/primerMundo.unity
     guid: c8693e2c1140efd489a2f2178cc3ed5a
   - enabled: 1
@@ -14,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/EcenesEJEC/Map_v1.unity
     guid: 5a463281e6e238742a45430f11e82829
+  - enabled: 1
+    path: Assets/ResultadosEscene.unity
+    guid: 7536fe9593979e84c8af1c91985d66cc
   m_configObjects: {}

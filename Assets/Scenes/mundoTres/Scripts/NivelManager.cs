@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class NivelManager : MonoBehaviour
 {
@@ -103,7 +104,7 @@ public class NivelManager : MonoBehaviour
             return;
             
         gameEnded = true;
-        Time.timeScale = 0f;
+        Time.timeScale = 1f; // Reanudamos para que la corrutina funcione
 
         Debug.Log("🏆 ¡VICTORIA! Mostrando Win_Panel");
 
@@ -115,6 +116,21 @@ public class NivelManager : MonoBehaviour
         {
             Debug.LogError("❌ No se puede mostrar Victoria - Panel no asignado");
         }
+        
+        // Iniciar corrutina para cargar ResultadosEscene después de 3 segundos
+        StartCoroutine(LoadResultsSceneAfterDelay(3f));
+    }
+    
+    // Corrutina para cargar la escena de resultados
+    private IEnumerator LoadResultsSceneAfterDelay(float delay)
+    {
+        Debug.Log("⏱️ Esperando " + delay + " segundos antes de cargar ResultadosEscene...");
+        
+        yield return new WaitForSeconds(delay);
+        
+        Debug.Log("🎬 Cargando ResultadosEscene (índice 4)...");
+        // ResultadosEscene está en el índice 4 del Build Settings
+        SceneManager.LoadScene(4);
     }
 
     // ===== FUNCIONES PARA BOTONES =====

@@ -5751,8 +5751,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e34d1a64fb0b68418f1b3963c81d08b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeSeconds: 20
-  requiredScore: 100
+  timeSeconds: 10
+  requiredScore: 300
   timerText: {fileID: 23471380}
   messageText: {fileID: 1873449157}
 --- !u!4 &1823546626
